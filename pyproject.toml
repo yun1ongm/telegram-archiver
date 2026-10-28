@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telegram-archiver"
+version = "0.1.0"
+description = "Download Telegram channel history and listen to live messages — export to SQLite, CSV, or Parquet"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["telegram", "archive", "telethon", "etl", "backup"]
+dependencies = [
+    "telethon>=1.34",
+    "typer>=0.12",
+    "rich>=13",
+    "qrcode>=7.4",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+parquet = ["pyarrow>=14"]
+
+[project.scripts]
+tg-archiver = "telegram_archiver.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]

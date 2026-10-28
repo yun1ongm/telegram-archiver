@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+
+# ---- 敏感文件：绝不提交 ----
+.env
+*.session
+*.session-journal
+credentials.json
+channels.json
+
+# 数据与日志
+data/
+logs/
+*.log
+*.db
+*.sqlite3
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
