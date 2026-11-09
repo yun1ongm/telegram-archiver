@@ -60,4 +60,6 @@ class LiveListener:
             except Exception:  # noqa: BLE001
                 logger.exception("处理新消息失败")
 
+        # Initialize channel pts and access hashes in this watch client.
+        await self.client.get_dialogs(limit=None)
         await self.client.run_until_disconnected()

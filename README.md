@@ -4,6 +4,8 @@
 
 一个 Telegram 频道归档工具：**历史消息下载 + 实时监听**，输出 **SQLite / CSV / Parquet**。基于 Telethon，使用你自己的 Telegram API 凭据，所有数据只存在你本机。
 
+当前版本：**0.1.1**。更新记录见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 功能特性
 
 - 📥 **历史下载**：批量拉取频道全部历史，自动去重，断点续传，遇限流自动等待重试
@@ -107,6 +109,15 @@ CI/服务器场景下不需要 `credentials.json`。
 三种格式都按 `(channel_id, message_id)` 去重，重复运行不会产生重复数据。
 
 ## 常见问题
+
+**实时消息比 Telegram 客户端慢几分钟？**
+从 0.1.1 起，`watch` 会加载频道更新状态，并将无更新时的补取超时从 15 分钟缩短到
+60 秒。正常推送仍直接处理；60 秒不是端到端延迟保证，网络、限流和多频道补取也会影响
+实际时间。该设置会增加所有已知频道（含非白名单订阅频道）的 API 请求。
+可运行 `tg-archiver watch --verbose` 查看补取、限流和重连日志。
+此优化使用内部接口，因此依赖固定为经过验证的 Telethon 1.45.0。
+在实际运行环境升级安装后，需要重启 `watch` 进程才会使用新逻辑。
+详细机制和验证方法见 [延迟调查记录](docs/telethon-update-latency.md)。
 
 **触发 FloodWait / 限流怎么办？**
 工具会自动等待 Telegram 要求的秒数并重试。日常可把批次间隔调大：`tg-archiver fetch --all --rate-limit 2`。

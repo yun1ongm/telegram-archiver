@@ -1,6 +1,8 @@
 ---
 name: telegram-archiver
 description: 下载 Telegram 频道历史消息、实时监听新消息，并输出为 SQLite / CSV / Parquet。当用户想要归档、备份、分析 Telegram 频道内容，或管理 tg-archiver 的频道白名单时使用。
+metadata:
+  version: "0.1.1"
 ---
 
 # telegram-archiver
@@ -29,8 +31,21 @@ tg-archiver fetch --all --incremental                # 全量频道增量更新
 tg-archiver fetch -c @username --storage csv -o ./out  # 直接输出 CSV
 
 tg-archiver watch                             # 实时监听（常驻前台，长时间运行请放后台）
+tg-archiver watch --verbose                   # 排查更新补取、限流和重连
 tg-archiver export --format parquet -o ./lake # SQLite 导出为 parquet/csv
 ```
+
+## 实时监听与延迟
+
+- 从 0.1.1 起，`watch` 在连接前将 Telethon 的无更新补取超时从 900 秒缩短到 60 秒，
+  注册处理器后加载一次 dialogs，初始化频道更新位置和访问信息。
+- 60 秒是补取等待设置，不保证所有消息在 60 秒内到达。此设置会增加当前进程内所有
+  已知频道的补取请求，包含非白名单订阅频道；大量频道运行时应查看限流日志。
+- 使用包声明的 Telethon 1.45.0；此优化依赖内部接口，升级依赖时需重新验证。
+  升级安装后需重启监听进程才能生效。
+- 若用户反馈延迟，按 [延迟调查与验证说明](docs/telethon-update-latency.md) 区分事件到达、
+  处理和写盘延迟。`get_dialogs()` 不负责补齐离线历史，历史补下载仍使用 `fetch --incremental`。
+- 版本更新记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 存储说明
 

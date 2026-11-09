@@ -275,17 +275,24 @@ def watch(
 
 
 async def _watch(storage, output, session) -> None:
+    from telethon._updates import messagebox
+
+    # Internal Telethon setting: apply before connect() loads update deadlines.
+    messagebox.NO_UPDATES_TIMEOUT = 60
+
     registry = ChannelRegistry()
     client = build_client(session)
-    await ensure_authorized(client)
-    with open_storage(storage, str(output) if output else None) as store:
-        listener = LiveListener(client, store, registry)
-        console.print("[green]监听中… Ctrl+C 停止[/green]")
-        try:
-            await listener.start()
-        except KeyboardInterrupt:
-            pass
-    await client.disconnect()
+    try:
+        await ensure_authorized(client)
+        with open_storage(storage, str(output) if output else None) as store:
+            listener = LiveListener(client, store, registry)
+            console.print("[green]监听中… Ctrl+C 停止[/green]")
+            try:
+                await listener.start()
+            except KeyboardInterrupt:
+                pass
+    finally:
+        await client.disconnect()
     console.print("已停止。")
 
 
